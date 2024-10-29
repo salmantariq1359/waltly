@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.6.3" jmeter="5.6.3">
     <hashTree>
-        <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
-            <stringProp name="TestPlan.comments"/>
-            <boolProp name="TestPlan.user_defined_variables"/>
+        <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Plugins Manager" enabled="true">
+            <stringProp name="TestPlan.comments">Plugins Manager Test Plan</stringProp>
+            <boolProp name="TestPlan.user_defined_variables">false</boolProp>
             <elementProp name="TestPlan.userDefinedVariables" guiclass="UserDefinedVariablesGui" testclass="Arguments" testname="User Defined Variables" enabled="true"/>
-            <stringProp name="TestPlan.tearDownOnShutdown" />
-            <stringProp name="TestPlan.numThreads" />
-            <stringProp name="TestPlan.rampTime" />
+            <stringProp name="TestPlan.tearDownOnShutdown">true</stringProp>
+            <stringProp name="TestPlan.numThreads">1</stringProp>
+            <stringProp name="TestPlan.rampTime">1</stringProp>
         </TestPlan>
         <hashTree/>
     </hashTree>
