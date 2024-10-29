@@ -3,41 +3,23 @@ version: 2.1
 executors:
   jmeter-executor:
     docker:
-      - image: circleci/openjdk:8-jdk
-    working_directory: ~/project
+      - image: jmeter:5.6.3
 
 jobs:
-  jmeter_test:
+  run-jmeter-tests:
     executor: jmeter-executor
     steps:
       - checkout
       - run:
-          name: Download and Install JMeter
+          name: Set Up JMeter
           command: |
-            wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.6.3.tgz
-            tar -xvzf apache-jmeter-5.6.3.tgz
-            mv apache-jmeter-5.6.3 ~/jmeter
-      - run:
-          name: Copy Plugins Manager
-          command: |
-            cp plugins/jmeter-plugins-manager-1.10.jar ~/jmeter/lib/ext/
-      - run:
-          name: Install Required Plugins
-          command: |
-            ~/jmeter/bin/jmeter -n -t tests/test.jmx -l results.jtl
-      - run:
-          name: Run JMeter Test
-          command: |
-            ~/jmeter/bin/jmeter -n -t tests/test.jmx -l results.jtl
-      - store_artifacts:
-          path: results.jtl
-          destination: jmeter-results
-      - store_artifacts:
-          path: report
-          destination: jmeter-report
+            mkdir -p /opt/jmeter/tests
+            cp -r tests/* /opt/jmeter/tests/
+            # If you need to run the JMeter command, add it here
+            jmeter -n -t /opt/jmeter/tests/test.jmx -l results.jtl
 
 workflows:
   version: 2
-  test-workflow:
+  test:
     jobs:
-      - jmeter_test
+      - run-jmeter-tests
