@@ -26,14 +26,14 @@ jobs:
       - run:
           name: Install JMeter Plugins Manager
           command: |
-            # Download the JMeter Plugins Manager JAR file
-            wget https://jmeter-plugins.org/downloads/all/plugins-manager.jar -O jmeter/lib/ext/plugins-manager.jar
+            # Move the Plugins Manager JAR file to the correct directory
+            mv plugins/jmeter-plugins-manager-1.10.jar jmeter/lib/ext/
       - run:
           name: Install Required Plugins
           command: |
             cd jmeter/bin
-            # Run JMeter to install the necessary plugins
-            ./jmeter -n -e -t plugins-manager.jmx -JpluginList="jp@gc - Transactions per Second"
+            # Install plugins using the Plugins Manager
+            ./jmeter -n -JpluginList="jp@gc - Transactions per Second" -t plugins-manager.jmx
       - run:
           name: Check JMeter Version
           command: jmeter --version
