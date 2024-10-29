@@ -20,7 +20,7 @@ jobs:
       - run:
           name: Run JMeter Test
           command: |
-            jmeter -n -t tests/performance_test.jmx -l results.jtl
+            jmeter -n -t tests/Waltly_stage_check2.jmx -l results.jtl
             jmeter -e -o report -g results.jtl  # Generate HTML report directly
       - run:
           name: Generate HTML Report from JTL
