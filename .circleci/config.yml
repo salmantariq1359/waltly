@@ -12,48 +12,29 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install JMeter 5.6.3
+          name: Download and Install JMeter
           command: |
             wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.6.3.tgz
-            tar -xzf apache-jmeter-5.6.3.tgz
-            mv apache-jmeter-5.6.3 ./jmeter
-            echo 'export PATH=$PATH:$(pwd)/jmeter/bin' >> $BASH_ENV
-            source $BASH_ENV
+            tar -xvzf apache-jmeter-5.6.3.tgz
+            mv apache-jmeter-5.6.3 /opt/jmeter
       - run:
-          name: Install JMeter Plugins Manager
+          name: Copy Plugins Manager
           command: |
-            mv plugins/jmeter-plugins-manager-1.10.jar jmeter/lib/ext/
-      - run:  #change
-          name: List Files
-          command: |
-            ls -R /home/circleci/project/
+            cp plugins/jmeter-plugins-manager-1.10.jar /opt/jmeter/lib/ext/
       - run:
           name: Install Required Plugins
           command: |
-            cd jmeter/bin
-            ./jmeter -n -t ../../tests/plugins-manager.jmx  # Adjust the path to the JMX file
-      - run:
-          name: Check JMeter Version
-          command: jmeter --version
-      - run:
-          name: Verify JMX File
-          command: |
-            ls tests  # List files in the tests directory to confirm presence of the JMX file
+            /opt/jmeter/bin/jmeter -n -t tests/plugins-manager.jmx -l results.jtl
       - run:
           name: Run JMeter Test
           command: |
-            jmeter -n -t tests/test.jmx -l results.jtl  # Run tests and generate JTL
-      - run:
-          name: Generate HTML Report from JTL
-          command: |
-            jmeter -g results.jtl -o report  # Generate HTML report from JTL
-
-      - store_artifacts:
-          path: report
-          destination: jmeter-report
+            /opt/jmeter/bin/jmeter -n -t tests/test.jmx -l results.jtl
       - store_artifacts:
           path: results.jtl
           destination: jmeter-results
+      - store_artifacts:
+          path: report
+          destination: jmeter-report
 
 workflows:
   version: 2
