@@ -26,14 +26,14 @@ jobs:
       - run:
           name: Install JMeter Plugins Manager
           command: |
-            # Download the JMeter Plugins Manager
-            wget https://jmeter-plugins.org/files/plugins/jmeter-plugins-manager.jar -O jmeter/bin/plugins-manager.jar
+            # Download the JMeter Plugins Manager JAR file
+            wget https://jmeter-plugins.org/downloads/all/plugins-manager.jar -O jmeter/lib/ext/plugins-manager.jar
       - run:
           name: Install Required Plugins
           command: |
             cd jmeter/bin
-            # Install the jp@gc - Transactions per Second plugin
-            java -jar plugins-manager.jar install jp@gc - Transactions per Second
+            # Run JMeter to install the necessary plugins
+            ./jmeter -n -e -t plugins-manager.jmx -JpluginList="jp@gc - Transactions per Second"
       - run:
           name: Check JMeter Version
           command: jmeter --version
