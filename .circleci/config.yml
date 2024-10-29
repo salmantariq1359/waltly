@@ -3,23 +3,51 @@ version: 2.1
 executors:
   jmeter-executor:
     docker:
-      - image: jmeter:5.6.3
+      - image: circleci/openjdk:8-jdk  # Use the OpenJDK image
+    working_directory: ~/project
 
 jobs:
-  run-jmeter-tests:
+  jmeter_test:
     executor: jmeter-executor
     steps:
       - checkout
       - run:
-          name: Set Up JMeter
+          name: Install JMeter 5.6.3
           command: |
-            mkdir -p /opt/jmeter/tests
-            cp -r tests/* /opt/jmeter/tests/
-            # If you need to run the JMeter command, add it here
-            jmeter -n -t /opt/jmeter/tests/test.jmx -l results.jtl
+            # Download JMeter 5.6.3
+            wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.6.3.tgz
+            # Extract the downloaded file
+            tar -xzf apache-jmeter-5.6.3.tgz
+            # Move to a more convenient location within the project directory
+            mv apache-jmeter-5.6.3 ./jmeter
+            # Add JMeter to PATH
+            echo 'export PATH=$PATH:$(pwd)/jmeter/bin' >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          name: Check JMeter Version
+          command: jmeter --version
+      - run:
+          name: Verify JMX File
+          command: |
+            ls tests  # List files in the tests directory to confirm presence of the JMX file
+      - run:
+          name: Run JMeter Test
+          command: |
+            jmeter -n -t tests/Test2.jmx -l results.jtl  # Run tests and generate JTL
+      - run:
+          name: Generate HTML Report from JTL
+          command: |
+            jmeter -g results.jtl -o report  # Generate HTML report from JTL
+
+      - store_artifacts:
+          path: report
+          destination: jmeter-report
+      - store_artifacts:
+          path: results.jtl
+          destination: jmeter-results
 
 workflows:
   version: 2
-  test:
+  test-workflow:
     jobs:
-      - run-jmeter-tests
+      - jmeter_test
