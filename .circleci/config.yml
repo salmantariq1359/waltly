@@ -3,7 +3,7 @@ version: 2.1
 executors:
   jmeter-executor:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: justb4/jmeter:latest  # Use a more recent JMeter Docker image
     working_directory: ~/project
 
 jobs:
@@ -12,24 +12,26 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install JMeter
+          name: Install Python
           command: |
             sudo apt-get update
-            sudo apt-get install -y jmeter python3 python3-pip
-            pip3 install pandas  # Install pandas for HTML report generation
+            sudo apt-get install -y python3 python3-pip
+            pip3 install pandas  # Install pandas for any future use
+      - run:
+          name: Check JMeter Version
+          command: jmeter --version
+      - run:
+          name: Verify JMX File
+          command: |
+            ls tests  # List files in the tests directory to confirm presence of the JMX file
       - run:
           name: Run JMeter Test
           command: |
-            jmeter -n -t tests/test.jmx -l results.jtl
-            jmeter -e -o report -g results.jtl  # Generate HTML report directly
+            jmeter -n -t tests/test.jmx -l results.jtl  # Run tests and generate JTL
       - run:
           name: Generate HTML Report from JTL
           command: |
-            # Create a simple Python script to convert results.jtl to HTML if necessary
-            echo "import pandas as pd; df = pd.read_csv('results.jtl', delimiter=','); df.to_html('report/report.html')" > generate_report.py
-            
-            # Run the Python script
-            python3 generate_report.py
+            jmeter -g results.jtl -o report  # Generate HTML report from JTL
 
       - store_artifacts:
           path: report
