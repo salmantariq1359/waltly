@@ -27,7 +27,7 @@ jobs:
           destination: jmeter-report
       - run:
          name: Fail Build on High Response Times
-          command: |
+         command: |
             if [ -f report/statistics.json ]; then
               avg_time=$(grep -oP '(?<=<average>).*(?=</average>)' report/statistics.json)
               if [ "$avg_time" -gt 2000 ]; then
