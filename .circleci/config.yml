@@ -24,7 +24,7 @@ jobs:
       - run:
           name: Install Required Plugins
           command: |
-            ~/jmeter/bin/jmeter -n -t tests/plugins-manager.jmx -l results.jtl
+            ~/jmeter/bin/jmeter -n -t tests/test.jmx -l results.jtl
       - run:
           name: Run JMeter Test
           command: |
