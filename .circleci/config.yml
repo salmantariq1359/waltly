@@ -33,3 +33,9 @@ jobs:
               echo "Average response time is too high: $avg_time ms"
               exit 1
             fi
+
+workflows:
+  version: 2
+  test-workflow:
+    jobs:
+      - jmeter_test
