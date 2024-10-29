@@ -20,18 +20,14 @@ jobs:
       - run:
           name: Run JMeter Test
           command: |
-            jmeter -n -t tests/performance_test.jmx -l results.jtl
-            jmeter -g results.jtl -o report  # Generate additional report files
+            jmeter -n -t tests/performance_tests.jmx -l results.jtl
+            jmeter -e -o report -g results.jtl  # Generate HTML report directly
       - run:
-          name: Generate HTML Report from CSV
+          name: Generate HTML Report from JTL
           command: |
-            # Assuming the JMeter test results are in results.jtl
-            # Convert results.jtl to CSV using JMeter command (if needed)
-            jmeter -Jjmeter.save.format=csv -g results.jtl -o csv_report
-
-            # Create a simple Python script to convert CSV to HTML
-            echo "import pandas as pd; df = pd.read_csv('csv_report/results.csv'); df.to_html('report/report.html')" > generate_report.py
-
+            # Create a simple Python script to convert results.jtl to HTML if necessary
+            echo "import pandas as pd; df = pd.read_csv('results.jtl', delimiter=','); df.to_html('report/report.html')" > generate_report.py
+            
             # Run the Python script
             python3 generate_report.py
 
