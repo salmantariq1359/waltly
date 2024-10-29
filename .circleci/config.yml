@@ -18,10 +18,10 @@ jobs:
             wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.6.3.tgz
             # Extract the downloaded file
             tar -xzf apache-jmeter-5.6.3.tgz
-            # Move to a more convenient location
-            mv apache-jmeter-5.6.3 /opt/jmeter
+            # Move to a more convenient location within the project directory
+            mv apache-jmeter-5.6.3 ./jmeter
             # Add JMeter to PATH
-            echo 'export PATH=$PATH:/opt/jmeter/bin' >> $BASH_ENV
+            echo 'export PATH=$PATH:$(pwd)/jmeter/bin' >> $BASH_ENV
             source $BASH_ENV
       - run:
           name: Check JMeter Version
