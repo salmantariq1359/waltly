@@ -23,11 +23,15 @@ jobs:
           name: Install JMeter Plugins Manager
           command: |
             mv plugins/jmeter-plugins-manager-1.10.jar jmeter/lib/ext/
+      - run:  #change
+          name: List Files
+          command: |
+            ls -R /home/circleci/project/
       - run:
           name: Install Required Plugins
           command: |
             cd jmeter/bin
-            ./jmeter -n -t tests/plugins-manager.jmx  # Adjust the path to the JMX file
+            ./jmeter -n -t ../../tests/plugins-manager.jmx  # Adjust the path to the JMX file
       - run:
           name: Check JMeter Version
           command: jmeter --version
