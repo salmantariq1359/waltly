@@ -27,7 +27,7 @@ jobs:
           name: Install Required Plugins
           command: |
             cd jmeter/bin
-            ./jmeter -n -t ../../tests/plugins-manager.jmx  # Adjust the path to the JMX file
+            ./jmeter -n -t tests/plugins-manager.jmx  # Adjust the path to the JMX file
       - run:
           name: Check JMeter Version
           command: jmeter --version
