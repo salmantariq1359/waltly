@@ -1,0 +1,35 @@
+version: 2.1
+
+executors:
+  jmeter-executor:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    working_directory: ~/project
+
+jobs:
+  jmeter_test:
+    executor: jmeter-executor
+    steps:
+      - checkout
+      - run:
+          name: Install JMeter
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y jmeter
+      - run:
+          name: Run JMeter Test
+          command: jmeter -n -t tests/performance_test.jmx -l results.jtl -e -o report
+      - store_artifacts:
+          path: results.jtl
+          destination: jmeter-results
+      - store_artifacts:
+          path: report
+          destination: jmeter-report
+      - run:
+          name: Fail Build on High Response Times
+          command: |
+            avg_time=$(grep -oP '(?<=<average>).*(?=</average>)' report/statistics.json)
+            if [ "$avg_time" -gt 2000 ]; then
+              echo "Average response time is too high: $avg_time ms"
+              exit 1
+            fi
