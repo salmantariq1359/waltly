@@ -18,7 +18,9 @@ jobs:
             sudo apt-get install -y jmeter
       - run:
           name: Run JMeter Test
-          command: jmeter -n -t tests/performance_test.jmx -l results.jtl -e -o report
+          command: jmeter -n -t tests/performance_test.jmx -l results.jtl -e -o report -j jmeter.log
+                   jmeter -g results.jtl -o report  # Generate additional report files
+
       - store_artifacts:
           path: results.jtl
           destination: jmeter-results
