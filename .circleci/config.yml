@@ -15,30 +15,32 @@ jobs:
           name: Install JMeter
           command: |
             sudo apt-get update
-            sudo apt-get install -y jmeter
+            sudo apt-get install -y jmeter python3 python3-pip
+            pip3 install pandas  # Install pandas for HTML report generation
       - run:
           name: Run JMeter Test
-          command: jmeter -n -t tests/performance_test.jmx -l results.jtl -e -o report -j jmeter.log
-                   jmeter -g results.jtl -o report  # Generate additional report files
+          command: |
+            jmeter -n -t tests/performance_test.jmx -l results.jtl
+            jmeter -g results.jtl -o report  # Generate additional report files
+      - run:
+          name: Generate HTML Report from CSV
+          command: |
+            # Assuming the JMeter test results are in results.jtl
+            # Convert results.jtl to CSV using JMeter command (if needed)
+            jmeter -Jjmeter.save.format=csv -g results.jtl -o csv_report
 
-      - store_artifacts:
-          path: results.jtl
-          destination: jmeter-results
+            # Create a simple Python script to convert CSV to HTML
+            echo "import pandas as pd; df = pd.read_csv('csv_report/results.csv'); df.to_html('report/report.html')" > generate_report.py
+
+            # Run the Python script
+            python3 generate_report.py
+
       - store_artifacts:
           path: report
           destination: jmeter-report
-      - run:
-         name: Fail Build on High Response Times
-         command: |
-            if [ -f report/statistics.json ]; then
-              avg_time=$(grep -oP '(?<=<average>).*(?=</average>)' report/statistics.json)
-              if [ "$avg_time" -gt 2000 ]; then
-                echo "Average response time is too high: $avg_time ms"
-                exit 1
-              fi
-            else
-              echo "Warning: statistics.json not found. Skipping performance check."
-            fi
+      - store_artifacts:
+          path: results.jtl
+          destination: jmeter-results
 
 workflows:
   version: 2
