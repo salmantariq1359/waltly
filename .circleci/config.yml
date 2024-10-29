@@ -3,7 +3,7 @@ version: 2.1
 executors:
   jmeter-executor:
     docker:
-      - image: circleci/openjdk:8-jdk  # Use a more recent JMeter Docker image
+      - image: justb4/jmeter:5.6.3  # Use a more recent JMeter Docker image
     working_directory: ~/project
 
 jobs:
