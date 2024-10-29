@@ -3,7 +3,7 @@ version: 2.1
 executors:
   jmeter-executor:
     docker:
-      - image: justb4/jmeter:5.6.3  # Use a more recent JMeter Docker image
+      - image: circleci/openjdk:8-jdk  # Use the OpenJDK image
     working_directory: ~/project
 
 jobs:
@@ -12,11 +12,17 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install Python and Pip
+          name: Install JMeter 5.6.3
           command: |
-            sudo apt-get update
-            sudo apt-get install -y jmeter python3 python3-pip
-            pip3 install pandas  # Install pandas for any future use
+            # Download JMeter 5.6.3
+            wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.6.3.tgz
+            # Extract the downloaded file
+            tar -xzf apache-jmeter-5.6.3.tgz
+            # Move to a more convenient location
+            mv apache-jmeter-5.6.3 /opt/jmeter
+            # Add JMeter to PATH
+            echo 'export PATH=$PATH:/opt/jmeter/bin' >> $BASH_ENV
+            source $BASH_ENV
       - run:
           name: Check JMeter Version
           command: jmeter --version
