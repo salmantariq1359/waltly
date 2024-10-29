@@ -24,6 +24,20 @@ jobs:
             echo 'export PATH=$PATH:$(pwd)/jmeter/bin' >> $BASH_ENV
             source $BASH_ENV
       - run:
+          name: Install JMeter Plugins Manager
+          command: |
+            cd jmeter
+            wget https://jmeter-plugins.org/files/plugins/JMeterPlugins-Manager.zip
+            unzip JMeterPlugins-Manager.zip
+            rm JMeterPlugins-Manager.zip
+            # Install the required plugins
+            ./bin/jmeter -n -t ./bin/jmeter-plugins-manager.jmx
+      - run:
+          name: Install Required Plugins
+          command: |
+            cd jmeter/bin
+            ./jmeter-plugins-manager install jp@gc - Transactions per Second
+      - run:
           name: Check JMeter Version
           command: jmeter --version
       - run:
