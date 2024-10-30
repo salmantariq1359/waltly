@@ -33,7 +33,7 @@ jobs:
       - run:
           name: Run JMeter Test
           command: |
-            jmeter -n -t tests/Test4.jmx -l results.jtl  # Run tests and generate JTL
+            jmeter -n -t tests/Test5.jmx -l results.jtl  # Run tests and generate JTL
       - run:
           name: Generate HTML Report from JTL
           command: |
