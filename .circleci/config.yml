@@ -3,7 +3,7 @@ version: 2.1
 executors:
   jmeter-executor:
     docker:
-      - image: circleci/openjdk:8-jdk  # Use the OpenJDK image
+      - image: cimg/openjdk:17.0  # Use OpenJDK 17 for compatibility
     working_directory: ~/project
 
 jobs:
@@ -14,31 +14,31 @@ jobs:
       - run:
           name: Install JMeter 5.6.3
           command: |
-            # Download JMeter 5.6.3
+            echo "Installing JMeter..."
             wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.6.3.tgz
-            # Extract the downloaded file
             tar -xzf apache-jmeter-5.6.3.tgz
-            # Move to a more convenient location within the project directory
             mv apache-jmeter-5.6.3 ./jmeter
-            # Add JMeter to PATH
             echo 'export PATH=$PATH:$(pwd)/jmeter/bin' >> $BASH_ENV
             source $BASH_ENV
+            jmeter --version  # Confirm installation
       - run:
-          name: Check JMeter Version
-          command: jmeter --version
+          name: Set Heap Memory for JMeter
+          command: echo 'export HEAP="-Xms2g -Xmx4g -XX:MaxMetaspaceSize=512m"' >> $BASH_ENV
       - run:
           name: Verify JMX File
           command: |
-            ls tests  # List files in the tests directory to confirm presence of the JMX file
+            echo "Checking JMX test file..."
+            ls tests  # Ensure the JMX file exists in the 'tests' directory
       - run:
-          name: Run JMeter Test
+          name: Run JMeter Test in Non-GUI Mode
           command: |
-            jmeter -n -t VRT.jmx -l results.jtl  # Run tests and generate JTL
+            echo "Starting JMeter load test..."
+            jmeter -n -t tests/VRT.jmx -l results.jtl -e -o report  # Run test & generate report
       - run:
           name: Generate HTML Report from JTL
           command: |
-            jmeter -g results.jtl -o report  # Generate HTML report from JTL
-
+            echo "Generating JMeter HTML report..."
+            jmeter -g results.jtl -o report
       - store_artifacts:
           path: report
           destination: jmeter-report
@@ -48,6 +48,6 @@ jobs:
 
 workflows:
   version: 2
-  single-workflow::
+  jmeter-workflow:
     jobs:
       - jmeter_test
