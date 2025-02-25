@@ -33,7 +33,7 @@ jobs:
           name: Run JMeter Test in Non-GUI Mode
           command: |
             echo "Starting JMeter load test..."
-            jmeter -n -t tests/VRT.jmx -l results.jtl -e -o report  # Run test & generate report
+            jmeter -n -t tests/VRT.jmx -l results.jtl -e -o report -Jserver.exitaftertest=true
       - run:
           name: Generate HTML Report from JTL
           command: |
