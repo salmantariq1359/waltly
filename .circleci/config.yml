@@ -43,8 +43,14 @@ jobs:
           name: Run JMeter Test in Non-GUI Mode
           command: |
             echo "Starting JMeter load test..."
-            jmeter -n -t tests/PTR.jmx -l results.jtl -e -o report -Jserver.exitaftertest=true -Jjmeterengine.force.system.exit=true || exit 1
+            jmeter -n -t tests/PTR.jmx -l results.jtl -e -o report \
+            -Jserver.exitaftertest=true \
+            -Jjmeterengine.force.system.exit=true \
+            -JNonGui.log_errors=true \
+            -Jlog_level.jmeter=DEBUG \
+            || exit 1
             echo "JMeter Test Execution Completed."
+
 
 
       - run:
