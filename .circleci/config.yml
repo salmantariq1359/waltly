@@ -29,10 +29,10 @@ jobs:
             jmeter --version
 
       - run:
-          name: Run JMeter Test in Non-GUI Mode
+          name: Run JMeter Test in Non-GUI Mode with Timeout
           command: |
             echo "Starting JMeter load test..."
-            jmeter -n -t tests/PTR.jmx -l results.jtl -e -o report \
+            timeout 10m jmeter -n -t tests/PTR.jmx -l results.jtl -e -o report \
               -Jserver.exitaftertest=true \
               -Jjmeterengine.force.system.exit=true \
               -JNonGui.log_errors=true \
