@@ -12,6 +12,14 @@ jobs:
     steps:
       - checkout  # Pull the latest code from GitHub
 
+      # Move JMX files to the correct directory if needed
+      - run:
+          name: Move JMX Files to Correct Directory
+          command: |
+            mkdir -p tests
+            mv *.jmx tests/
+            ls -lah tests
+
       - run:
           name: Install JMeter 5.6.3
           command: |
@@ -32,18 +40,19 @@ jobs:
       - run:
           name: Verify JMX File
           command: |
-            echo "Starting JMeter load test..."
-            jmeter -n -t tests/PTR.jmx -l results.jtl -e -o report -Jserver.exitaftertest=true || exit 1
-            echo "JMeter Test Execution Completed."
+            echo "Checking if tests directory exists..."
+            ls -lah tests || echo "ERROR: tests directory not found!"
+            echo "Checking if PTR.jmx file exists..."
+            if [ ! -f tests/PTR.jmx ]; then echo "ERROR: PTR.jmx not found!"; exit 1; fi
+            echo "File exists, proceeding..."
 
       - run:
           name: Run JMeter Test in Non-GUI Mode
+          working_directory: ~/project
           command: |
             echo "Starting JMeter load test..."
             jmeter -n -t tests/PTR.jmx -l results.jtl -e -o report -Jserver.exitaftertest=true || exit 1
             echo "JMeter Test Execution Completed."
-
-
 
       - run:
           name: Generate HTML Report from JTL
