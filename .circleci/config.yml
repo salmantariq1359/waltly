@@ -3,14 +3,15 @@ version: 2.1
 executors:
   jmeter-executor:
     docker:
-      - image: cimg/openjdk:17.0  # Use OpenJDK 17 for compatibility
+      - image: cimg/openjdk:17.0  # OpenJDK 17 for compatibility
     working_directory: ~/project
 
 jobs:
   jmeter_test:
     executor: jmeter-executor
     steps:
-      - checkout
+      - checkout  # Pull the latest code from GitHub
+
       - run:
           name: Install JMeter 5.6.3
           command: |
@@ -21,27 +22,38 @@ jobs:
             echo 'export PATH=$PATH:$(pwd)/jmeter/bin' >> $BASH_ENV
             source $BASH_ENV
             jmeter --version  # Confirm installation
+
       - run:
           name: Set Heap Memory for JMeter
-          command: echo 'export HEAP="-Xms2g -Xmx4g -XX:MaxMetaspaceSize=512m"' >> $BASH_ENV
+          command: |
+            echo 'export JVM_ARGS="-Xms2g -Xmx4g -XX:MaxMetaspaceSize=512m"' >> $BASH_ENV
+            source $BASH_ENV
+
       - run:
           name: Verify JMX File
           command: |
             echo "Checking JMX test file..."
-            ls tests  # Ensure the JMX file exists in the 'tests' directory
+            if [ ! -f tests/VRT.jmx ]; then echo "ERROR: JMX file not found!"; exit 1; fi
+            ls -lah tests  # Debugging: List test files
+
       - run:
           name: Run JMeter Test in Non-GUI Mode
           command: |
             echo "Starting JMeter load test..."
-            jmeter -n -t tests/VRT.jmx -l results.jtl -e -o report -Jserver.exitaftertest=true
+            jmeter -n -t tests/VRT.jmx -l results.jtl -e -o report -Jserver.exitaftertest=true || exit 1
+            echo "JMeter Test Execution Completed."
+
       - run:
           name: Generate HTML Report from JTL
           command: |
             echo "Generating JMeter HTML report..."
             jmeter -g results.jtl -o report
+            echo "Report generation completed."
+
       - store_artifacts:
           path: report
           destination: jmeter-report
+
       - store_artifacts:
           path: results.jtl
           destination: jmeter-results
