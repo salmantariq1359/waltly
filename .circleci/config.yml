@@ -10,47 +10,38 @@ jobs:
   jmeter_test:
     executor: jmeter-executor
     steps:
-      - checkout  # Pull latest code from GitHub
+      - checkout
+
+      - run:
+          name: Verify JMX File After Checkout
+          command: |
+            ls -lah tests/
+            pwd
 
       - run:
           name: Install JMeter 5.6.3
           command: |
-            echo "Installing JMeter..."
-            wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.6.3.tgz
+            wget https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.6.3.tgz
             tar -xzf apache-jmeter-5.6.3.tgz
             mv apache-jmeter-5.6.3 ./jmeter
             echo 'export PATH=$PATH:$(pwd)/jmeter/bin' >> $BASH_ENV
             source $BASH_ENV
-            jmeter --version  # Confirm installation
-
-      - run:
-          name: Set Heap Memory for JMeter
-          command: |
-            echo 'export JVM_ARGS="-Xms2g -Xmx4g -XX:MaxMetaspaceSize=512m"' >> $BASH_ENV
-            source $BASH_ENV
-
-      - run:
-          name: Verify JMX File
-          command: |
-            echo "Checking JMX test file..."
-            ls -lah tests  # Ensure the JMX file exists
-            test -f tests/PTR.jmx && echo "JMX file exists" || exit 1  # Ensure the file exists before proceeding
+            jmeter --version
 
       - run:
           name: Run JMeter Test in Non-GUI Mode
           command: |
             echo "Starting JMeter load test..."
             jmeter -n -t tests/PTR.jmx -l results.jtl -e -o report \
-                -Jserver.exitaftertest=true \
-                -Jjmeterengine.force.system.exit=true \
-                -JNonGui.log_errors=true \
-                -Jlog_level.jmeter=DEBUG || exit 1
+              -Jserver.exitaftertest=true \
+              -Jjmeterengine.force.system.exit=true \
+              -JNonGui.log_errors=true \
+              -Jlog_level.jmeter=DEBUG || exit 1
             echo "JMeter Test Execution Completed."
 
       - run:
           name: Generate HTML Report from JTL
           command: |
-            echo "Generating JMeter HTML report..."
             jmeter -g results.jtl -o report
             echo "Report generation completed."
 
