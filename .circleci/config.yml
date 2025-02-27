@@ -3,7 +3,7 @@ version: 2.1
 executors:
   jmeter-executor:
     docker:
-      - image: cimg/openjdk:17.0  # OpenJDK 17 for compatibility
+      - image: cimg/openjdk:17.0
     working_directory: ~/project
 
 jobs:
@@ -15,12 +15,14 @@ jobs:
       - run:
           name: Verify JMX File After Checkout
           command: |
+            echo "Listing files in 'tests' directory:"
             ls -lah tests/
             pwd
 
       - run:
           name: Install JMeter 5.6.3
           command: |
+            echo "Installing Apache JMeter 5.6.3..."
             wget https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.6.3.tgz
             tar -xzf apache-jmeter-5.6.3.tgz
             mv apache-jmeter-5.6.3 ./jmeter
@@ -29,27 +31,40 @@ jobs:
             jmeter --version
 
       - run:
+          name: Install Required JMeter Plugins
+          command: |
+            echo "Installing JMeter Plugins..."
+            wget https://jmeter-plugins.org/files/packages/jpgc-json-2.9.zip
+            unzip jpgc-json-2.9.zip -d ./jmeter/lib/ext
+
+      - run:
           name: Run JMeter Test in Non-GUI Mode with Timeout
           command: |
             echo "Starting JMeter load test..."
+            sudo apt-get update && sudo apt-get install -y coreutils || true
             timeout 10m jmeter -n -t tests/PTR.jmx -l results.jtl -e -o report \
               -Jserver.exitaftertest=true \
               -Jjmeterengine.force.system.exit=true \
               -JNonGui.log_errors=true \
-              -Jlog_level.jmeter=DEBUG || exit 1
+              -Jlog_level.jmeter=DEBUG \
+              -Jlog_level.org.apache=DEBUG \
+              -Jlog_level.jorphan=DEBUG || exit 1
             echo "JMeter Test Execution Completed."
 
       - run:
           name: Generate HTML Report from JTL
           command: |
+            echo "Generating JMeter HTML report..."
             jmeter -g results.jtl -o report
             echo "Report generation completed."
 
       - store_artifacts:
+          name: Store JMeter HTML Report
           path: report
           destination: jmeter-report
 
       - store_artifacts:
+          name: Store JMeter Results File
           path: results.jtl
           destination: jmeter-results
 
