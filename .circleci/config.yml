@@ -35,7 +35,6 @@ jobs:
           command: |
             echo "Starting JMeter load test..."
             sudo apt-get update && sudo apt-get install -y coreutils || true
-            # Uses resultssss.jtl and reportingssss
             timeout 10m jmeter -n -t tests/PTR2.jmx -l resultssss.jtl -e -o reportingssss \
               -Jserver.exitaftertest=true \
               -Jjmeterengine.force.system.exit=true \
