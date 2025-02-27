@@ -1,3 +1,5 @@
+# .circleci/config.yml
+
 version: 2.1
 
 executors:
@@ -29,13 +31,6 @@ jobs:
             echo 'export PATH=$PATH:$(pwd)/jmeter/bin' >> $BASH_ENV
             source $BASH_ENV
             jmeter --version
-
-      - run:
-          name: Install Required JMeter Plugins
-          command: |
-            echo "Installing JMeter JSON plugin (version 2.14)..."
-            wget https://repo1.maven.org/maven2/kg/apc/jmeter-plugins-json/2.14/jmeter-plugins-json-2.14.jar
-            mv jmeter-plugins-json-2.14.jar ./jmeter/lib/ext
 
       - run:
           name: Run JMeter Test in Non-GUI Mode with Timeout
