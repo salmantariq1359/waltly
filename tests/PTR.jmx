@@ -30,10 +30,12 @@ jobs:
             source $BASH_ENV
             jmeter --version
 
+      # Only add this step if you need extra plugins:
       - run:
           name: Install Required JMeter Plugins
           command: |
-            echo "Installing JMeter Plugins (example JSON plugin)..."
+            echo "Installing JMeter Plugins..."
+            # Example: JSON Plugin
             wget https://jmeter-plugins.org/files/packages/jpgc-json-2.9.zip
             unzip jpgc-json-2.9.zip -d ./jmeter/lib/ext
 
@@ -42,6 +44,8 @@ jobs:
           command: |
             echo "Starting JMeter load test..."
             sudo apt-get update && sudo apt-get install -y coreutils || true
+
+            # Wrap with 'timeout' to avoid infinite hangs
             timeout 10m jmeter -n -t tests/PTR.jmx -l results.jtl -e -o report \
               -Jserver.exitaftertest=true \
               -Jjmeterengine.force.system.exit=true \
@@ -49,6 +53,7 @@ jobs:
               -Jlog_level.jmeter=DEBUG \
               -Jlog_level.org.apache=DEBUG \
               -Jlog_level.jorphan=DEBUG || exit 1
+
             echo "JMeter Test Execution Completed."
 
       - run:
