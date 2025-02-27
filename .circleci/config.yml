@@ -13,7 +13,7 @@ jobs:
       - checkout
 
       - run:
-          name: Verify JMX File After Checkout
+          name: Verify JMX File
           command: |
             echo "Listing files in 'tests' directory:"
             ls -lah tests/
@@ -35,6 +35,8 @@ jobs:
           command: |
             echo "Starting JMeter load test..."
             sudo apt-get update && sudo apt-get install -y coreutils || true
+
+            # Run test for up to 10 minutes. If it doesn't finish, CircleCI kills it.
             timeout 10m jmeter -n -t tests/PTR2.jmx -l resultssss.jtl -e -o reportingssss \
               -Jserver.exitaftertest=true \
               -Jjmeterengine.force.system.exit=true \
@@ -42,12 +44,13 @@ jobs:
               -Jlog_level.jmeter=DEBUG \
               -Jlog_level.org.apache=DEBUG \
               -Jlog_level.jorphan=DEBUG || exit 1
+
             echo "JMeter Test Execution Completed."
 
       - run:
-          name: Generate HTML Report from resultssss.jtl
+          name: Generate Second HTML Report
           command: |
-            echo "Generating second JMeter HTML report in 'reportingssss2'..."
+            echo "Generating JMeter HTML report in 'reportingssss2'..."
             jmeter -g resultssss.jtl -o reportingssss2
             echo "Report generation completed."
 
@@ -62,7 +65,7 @@ jobs:
           destination: jmeter-report-final
 
       - store_artifacts:
-          name: Store JMeter Results File (resultssss.jtl)
+          name: Store JMeter Results File
           path: resultssss.jtl
           destination: jmeter-results
 
