@@ -3,7 +3,7 @@ version: 2.1
 executors:
   jmeter-executor:
     docker:
-      - image: cimg/openjdk:17.0  # Use an official CircleCI OpenJDK 17 image
+      - image: cimg/openjdk:17.0
     working_directory: ~/project
 
 jobs:
@@ -26,25 +26,29 @@ jobs:
             wget https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.6.3.tgz
             tar -xzf apache-jmeter-5.6.3.tgz
             mv apache-jmeter-5.6.3 ./jmeter
-            # Add JMeter bin folder to PATH
             echo 'export PATH=$PATH:$(pwd)/jmeter/bin' >> $BASH_ENV
             source $BASH_ENV
             jmeter --version
 
       - run:
+          name: Install Required JMeter Plugins
+          command: |
+            echo "Installing JMeter Plugins (example JSON plugin)..."
+            wget https://jmeter-plugins.org/files/packages/jpgc-json-2.9.zip
+            unzip jpgc-json-2.9.zip -d ./jmeter/lib/ext
+
+      - run:
           name: Run JMeter Test in Non-GUI Mode with Timeout
           command: |
             echo "Starting JMeter load test..."
-            # If 'timeout' is not found, install it. (Should usually be available by default on CircleCI's Linux images)
             sudo apt-get update && sudo apt-get install -y coreutils || true
-            
-            # Run JMeter with a 10-minute timeout
             timeout 10m jmeter -n -t tests/PTR.jmx -l results.jtl -e -o report \
               -Jserver.exitaftertest=true \
               -Jjmeterengine.force.system.exit=true \
               -JNonGui.log_errors=true \
-              -Jlog_level.jmeter=DEBUG || exit 1
-            
+              -Jlog_level.jmeter=DEBUG \
+              -Jlog_level.org.apache=DEBUG \
+              -Jlog_level.jorphan=DEBUG || exit 1
             echo "JMeter Test Execution Completed."
 
       - run:
