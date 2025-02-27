@@ -33,9 +33,9 @@ jobs:
       - run:
           name: Install Required JMeter Plugins
           command: |
-            echo "Installing JMeter Plugins..."
-            wget https://jmeter-plugins.org/files/packages/jpgc-json-2.9.zip
-            unzip jpgc-json-2.9.zip -d ./jmeter/lib/ext
+            echo "Installing JMeter JSON plugin..."
+            wget https://repo1.maven.org/maven2/kg/apc/jmeter-plugins-json/2.9/jmeter-plugins-json-2.9.jar
+            mv jmeter-plugins-json-2.9.jar ./jmeter/lib/ext
 
       - run:
           name: Run JMeter Test in Non-GUI Mode with Timeout
